@@ -8,95 +8,96 @@ $(function() {
         $(".notification").show();
     }
     setTimeout(explode, 2000);
-    $("#daily").click(function() {
-        var str = "Daily Pass";
-        var cost = 10.00;
-        dc = select(cost, str, dc);
-        id = "daily";
-        change(dc, id);
-    })
-    $("#weekly").click(function() {
-        var str = "Weekly Pass";
-        var cost = 20.00;
-        wc = select(cost, str, wc);
-        id = "weekly";
-        change(wc, id);
-    })
-    $("#month").click(function() {
-        var str = "Month Pass";
-        var cost = 50.00;
-        mc = select(cost, str, mc);
-        id = "month";
-        change(mc, id);
+    var content = [];
+    var cost = 0;
+    var counter = 0;
+    var data = "";
+    var price = [];
+    $(".col-xs-4 a").click(function() {
+        var id = $(this).attr('id');
+        var gprice = parseInt($(this).attr('price'));
+        var value = $(this).attr('value');
 
-    })
-    $("#annual").click(function() {
-        var str = "Annual Pass";
-        var cost = 60.00;
-        ac = select(cost, str, ac);
-        id = "annual";
-        change(ac, id);
-    })
-
-    var content = "";
-    var price = 0;
-    var counter = 0,
-        dc = 0,
-        wc = 0,
-        mc = 0,
-        ac = 0;
-
-    function select(rate, data, sub) {
-        if (counter == 0) {
-            content += data;
-            counter++;
-            price += rate;
-            sub = 1;
+        // alert(value);
+        if (content.length == 0) {
+            select(id, gprice);
+            $(this).text("REMOVE");
         } else {
-            if (!sub) {
-                content += '+' + data;
-                price += rate;
-                counter++;
-                sub = 1;
+            for (var i = 0; i < content.length; i++) {
+                var ac = (id == content[i]);
+                if (ac)
+                    break;
+            }
+            if (ac) {
+                index = i;
+                replace(id, gprice);
+                $(this).text("SELECT");
+                value = 0;
             } else {
-                sub = replace(data, sub, rate)
+                select(id, gprice);
+                $(this).text("REMOVE");
+                value = 1;
             }
         }
+        console.log(ac);
+        // ac=value;
 
-        $("#replace").html(content);
-        $("#pricecol").html('Price:' + price + ' dlls');
+    })
+
+
+
+    function select(data, rate) {
+        content.push(data);
+        price.push(rate);
+        console.log(content);
+        console.log(price);
+        var detail = "";
+        for (var i = 0; i < content.length; i++) {
+            if (i == 0) {
+                detail += content[i];
+            } else {
+                detail += "+" + content[i];
+            }
+        }
+        $("#replace").html(detail);
+        cost = 0;
+        for (var j = 0; j < price.length; j++) {
+            cost += price[j];
+
+        }
+        // alert(cost);
+        $("#pricecol").html(cost);
         $("#pricecol").show();
-        // alert(counter);
-        return sub;
+        counter++;
+        $()
     }
 
     //replace
 
-    function replace(data, psub, rrate) {
-        if (counter > 0) {
-            var sub = content.slice(0, data.length);
-            if (sub == data) {
-                content = content.replace(data, "");
-                content = content.replace('+', '');
-            } else {
-                content = content.replace("+" + data, "");
-            }
-        } else {
-            content = content.replace(data, "");
-        }
+    function replace(remove, cost) {
+        content = jQuery.grep(content, function(value) {
+            return value != remove;
+        });
         counter--;
-        price -= rrate;
-        psub = 0;
-        return psub;
-    }
-    // select or remove.....
-    function change(change, id) {
-        if (change == 1) {
-            var button = '<a href="#"  id="daily" style="font-size:13px;color:#4169e1;">REMOVE</a>';
-            $("#" + id).html(button);
-        } else {
-            var button = '<a href="#" id="daily">SELECT</a>';
-            $("#" + id).html(button);
+        price = jQuery.grep(price, function(value) {
+            return value != cost;
+        });
+        var detail = "";
+        for (var i = 0; i < content.length; i++) {
+            if (i == 0) {
+                detail += content[i];
+            } else {
+                detail += "+" + content[i];
+            }
         }
+        $("#replace").html(detail);
+        cost = 0;
+        for (var j = 0; j < price.length; j++) {
+            cost += price[j];
+
+        }
+        // alert(cost);
+        $("#pricecol").html(cost);
     }
+
 });
